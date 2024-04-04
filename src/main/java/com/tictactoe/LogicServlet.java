@@ -20,11 +20,11 @@ public class LogicServlet extends HttpServlet {
         // Отримуємо об'єкт ігрового поля з сесії
         Field field = extractField(currentSession);
 
-        // Отримуємо індекс ячейки, на яку відбувся клік
+        // Отримуємо індекс клітинки, на яку відбувся клік
         int index = getSelectedIndex(req);
         Sign currentSign = field.getField().get(index);
 
-        // Перевіряємо, що ячейка, на яку клікнули, порожня.
+        // Перевіряємо, що клітинка, на яку клікнули, порожня.
         // В іншому випадку нічого не робимо і направляємо користувача на ту ж сторінку без змін
         // параметрів у сесії
         if (Sign.EMPTY != currentSign) {
@@ -33,7 +33,7 @@ public class LogicServlet extends HttpServlet {
             return;
         }
 
-        // ставимо хрестик у ячейці, по якій клікнув користувач
+        // ставимо хрестик у клітинці, по якій клікнув користувач
         field.getField().put(index, Sign.CROSS);
 
         // Перевіряємо, чи не переміг хрестик після додавання останнього кліка користувача
@@ -41,7 +41,7 @@ public class LogicServlet extends HttpServlet {
             return;
         }
 
-        // Отримуємо порожню ячейку поля
+        // Отримуємо порожню клітинку поля
         int emptyFieldIndex = field.getEmptyFieldIndex();
 
         if (emptyFieldIndex >= 0) {
@@ -51,19 +51,13 @@ public class LogicServlet extends HttpServlet {
                 return;
             }
         }
-        // Якщо порожньої ячейки нема і ніхто не переміг – це нічия
+        // Якщо порожньої клітинки немає і ніхто не переміг – це нічия
         else {
             // Додаємо до сесії прапорець, який сигналізує, що відбулася нічия
             currentSession.setAttribute("draw", true);
 
-            // Рахуємо список значків
-            List<Sign> data = field.getFieldData();
-
-            // Оновлюємо цей список в сесії
-            currentSession.setAttribute("data", data);
-
-            // Шлемо редирект
-            resp.sendRedirect("/index.jsp");
+            // Рахуємо список значків, оновлюємо його і надсилаємо редирект
+            updateSessionAndRedirectToIndex(field, currentSession, resp);
             return;
         }
 
@@ -87,14 +81,9 @@ public class LogicServlet extends HttpServlet {
             // Додаємо прапорець, який показує, що хтось переміг
             currentSession.setAttribute("winner", winner);
 
-            // Рахуємо список значків
-            List<Sign> data = field.getFieldData();
+            // Рахуємо список значків, оновлюємо його і надсилаємо редирект
+            updateSessionAndRedirectToIndex(field, currentSession, response);
 
-            // Оновлюємо цей список у сесїі
-            currentSession.setAttribute("data", data);
-
-            // Шлемо редирект
-            response.sendRedirect("/index.jsp");
             return true;
         }
         return false;
@@ -113,5 +102,16 @@ public class LogicServlet extends HttpServlet {
             throw new RuntimeException("Session is broken, try one more time");
         }
         return (Field) fieldAttribute;
+    }
+
+    private void updateSessionAndRedirectToIndex(Field field, HttpSession currentSession, HttpServletResponse response) throws IOException {
+        // Рахуємо список значків
+        List<Sign> data = field.getFieldData();
+
+        // Оновлюємо цей список у сесїі
+        currentSession.setAttribute("data", data);
+
+        // Надсилаємо редирект
+        response.sendRedirect("/index.jsp");
     }
 }

@@ -1,11 +1,27 @@
+body {
+    text-align: center; /* Вирівнюємо текст по центру */
+    height: 100vh; /* Займає всю висоту екрану */
+    margin: 0; /* Видаляє зовнішні відступи */
+}
+
+h1 {
+    margin-bottom: 20px; /* Зовнішній відступ під заголовком */
+}
+
+table {
+    text-align: center; /* Центруємо текст у комірках таблиці */
+    margin: auto; /* Встановлюємо автоматичні зовнішні відступи */
+}
+
+
 td {
-    border: 3px solid black;
-    padding: 10px;
-    border-collapse: separate;
-    margin: 10px;
-    width: 100px;
-    height: 100px;
-    font-size: 50px;
-    text-align: center;
-    empty-cells: show;
+    border: 3px solid black; /* Встановлюємо товщину та колір меж */
+    padding: 5px; /* Додаємо внутрішній відступ */
+    border-collapse: separate; /* Розділяємо межі */
+    width: 100px; /* Фіксована ширина комірок */
+    height: 100px; /* Фіксована висота комірок */
+    font-size: 30px; /* Розмір шрифту */
+    text-align: center; /* Центруємо текст у комірках */
+    empty-cells: show; /* Показуємо порожні комірки */
+    margin: auto; /* Встановлюємо автоматичні зовнішні відступи */
 }
