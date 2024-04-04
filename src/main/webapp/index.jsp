@@ -36,15 +36,15 @@
 
 <c:if test="${winner == CROSSES}">
     <h1>CROSSES WIN!</h1>
-    <button onclick="restart()">Start again</button>
+    <button id="start-again" onclick="restart()">Start again</button>
 </c:if>
 <c:if test="${winner == NOUGHTS}">
     <h1>NOUGHTS WIN!</h1>
-    <button onclick="restart()">Start again</button>
+    <button id="start-again" onclick="restart()">Start again</button>
 </c:if>
 <c:if test="${draw}">
     <h1>IT'S A DRAW</h1>
-    <button onclick="restart()">Start again</button>
+    <button id="start-again" onclick="restart()">Start again</button>
 </c:if>
 
 <script>
