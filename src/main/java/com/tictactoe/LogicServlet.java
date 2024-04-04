@@ -13,15 +13,15 @@ import java.util.List;
 @WebServlet(name = "LogicServlet", value = "/logic")
 public class LogicServlet extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Отримуємо поточну сесію
-        HttpSession currentSession = req.getSession();
+        HttpSession currentSession = request.getSession();
 
         // Отримуємо об'єкт ігрового поля з сесії
         Field field = extractField(currentSession);
 
         // Отримуємо індекс клітинки, на яку відбувся клік
-        int index = getSelectedIndex(req);
+        int index = getSelectedIndex(request);
         Sign currentSign = field.getField().get(index);
 
         // Перевіряємо, що клітинка, на яку клікнули, порожня.
@@ -29,7 +29,7 @@ public class LogicServlet extends HttpServlet {
         // параметрів у сесії
         if (Sign.EMPTY != currentSign) {
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/index.jsp");
-            dispatcher.forward(req, resp);
+            dispatcher.forward(request, response);
             return;
         }
 
@@ -37,7 +37,7 @@ public class LogicServlet extends HttpServlet {
         field.getField().put(index, Sign.CROSS);
 
         // Перевіряємо, чи не переміг хрестик після додавання останнього кліка користувача
-        if (checkWin(resp, currentSession, field)) {
+        if (checkWin(response, currentSession, field)) {
             return;
         }
 
@@ -47,7 +47,7 @@ public class LogicServlet extends HttpServlet {
         if (emptyFieldIndex >= 0) {
             field.getField().put(emptyFieldIndex, Sign.NOUGHT);
             // Перевіряємо, чи не переміг нулик після додавання останнього нулика
-            if (checkWin(resp, currentSession, field)) {
+            if (checkWin(response, currentSession, field)) {
                 return;
             }
         }
@@ -57,18 +57,14 @@ public class LogicServlet extends HttpServlet {
             currentSession.setAttribute("draw", true);
 
             // Рахуємо список значків, оновлюємо його і надсилаємо редирект
-            updateSessionAndRedirectToIndex(field, currentSession, resp);
+            updateSessionAndRedirectToIndex(field, currentSession, response);
             return;
         }
 
-        // Рахуємо список значків
-        List<Sign> data = field.getFieldData();
-
-        // Оновлюємо об'єкт поля і список значків у сесії
-        currentSession.setAttribute("data", data);
+        // Оновлюємо об'єкт поля
         currentSession.setAttribute("field", field);
 
-        resp.sendRedirect("/index.jsp");
+        updateSessionAndRedirectToIndex(field, currentSession, response);
     }
 
     /**
