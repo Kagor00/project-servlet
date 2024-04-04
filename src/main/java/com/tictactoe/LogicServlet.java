@@ -20,11 +20,19 @@ public class LogicServlet extends HttpServlet {
         // Отримуємо об'єкт ігрового поля з сесії
         Field field = extractField(currentSession);
 
+        // Перевіряємо, чи гра закінчилася
+        if (currentSession.getAttribute("gameOver") != null) {
+            // Якщо гра закінчилася, перенаправляємо користувача на ту ж сторінку
+            // І не дозволяємо користувачу вносити зміни
+            response.sendRedirect("/index.jsp");
+            return;
+        }
+
         // Отримуємо індекс клітинки, на яку відбувся клік
         int index = getSelectedIndex(request);
         Sign currentSign = field.getField().get(index);
 
-        // Перевіряємо, що клітинка, на яку клікнули, порожня.
+        // Перевіряємо, чи клітинка, на яку клікнули, порожня.
         // В іншому випадку нічого не робимо і направляємо користувача на ту ж сторінку без змін
         // параметрів у сесії
         if (Sign.EMPTY != currentSign) {
@@ -38,6 +46,8 @@ public class LogicServlet extends HttpServlet {
 
         // Перевіряємо, чи не переміг хрестик після додавання останнього кліка користувача
         if (checkWin(response, currentSession, field)) {
+            // Якщо гра закінчилася, встановлюємо атрибут "gameOver" в сесії
+            currentSession.setAttribute("gameOver", true);
             return;
         }
 
@@ -48,6 +58,8 @@ public class LogicServlet extends HttpServlet {
             field.getField().put(emptyFieldIndex, Sign.NOUGHT);
             // Перевіряємо, чи не переміг нулик після додавання останнього нулика
             if (checkWin(response, currentSession, field)) {
+                // Якщо гра закінчилася, встановлюємо атрибут "gameOver" в сесії
+                currentSession.setAttribute("gameOver", true);
                 return;
             }
         }
@@ -58,6 +70,9 @@ public class LogicServlet extends HttpServlet {
 
             // Рахуємо список значків, оновлюємо його і надсилаємо редирект
             updateSessionAndRedirectToIndex(field, currentSession, response);
+
+            // Якщо гра закінчилася, встановлюємо атрибут "gameOver" в сесії
+            currentSession.setAttribute("gameOver", true);
             return;
         }
 
@@ -68,9 +83,9 @@ public class LogicServlet extends HttpServlet {
     }
 
     /**
-     * Метод перевіряє, чи нема трьох хрестиків/нуликов в ряд.
-     * Повертає true/false
-     */
+             * Метод перевіряє, чи нема трьох хрестиків/нуликов в ряд.
+             * Повертає true/false
+             */
     private boolean checkWin(HttpServletResponse response, HttpSession currentSession, Field field) throws IOException {
         Sign winner = field.checkWin();
         if (Sign.CROSS == winner || Sign.NOUGHT == winner) {
